@@ -30,6 +30,11 @@ juicebox.prototype.pack = function (user) {
 		})
 }
 
+// pushes juicebox content without first pulling
+juicebox.prototype.push = function (user) {
+	return this.force_pack(user)
+}
+
 // * ———————————————————————————————————————————————————————— * //
 // * 	pull
 // *
