@@ -11,6 +11,8 @@ api_call.prototype.call = function (req, res, enduro_server) {
 
 	let application_settings = enduro.cms_data.global.settings
 
+	if (! application_settings) { application_settings = {}; }
+
 	application_settings.juicebox_enabled = enduro.config.juicebox_enabled
 
 	application_settings.has_admins = true
