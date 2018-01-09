@@ -133,6 +133,9 @@ juicebox.prototype.force_pack = function (user) {
 						return write_juicefile(juice)
 					})
 					.then(() => {
+						return write_pages()
+					})
+					.then(() => {
 						return remote_handler.upload_to_filesystem_by_filepath('juicebox/juice.json', path.join(enduro.project_path, 'juicebox', 'juice.json'))
 					})
 					.then(() => {
@@ -201,6 +204,38 @@ juicebox.prototype.log = function (nojuice) {
 juicebox.prototype.is_juicebox_enabled = function () {
 	const juicefile_path = path.join(enduro.project_path, 'juicebox', 'juice.json')
 	return !flat_helpers.file_exists_sync(juicefile_path)
+}
+
+/**
+ * Write CMS pages to storage.  Useful for simple reference to 'latest' copy
+ * of page content.
+ */
+function write_pages () {
+	return new Promise( (resolve) => {
+		fs.readdir (path.join(enduro.project_path, 'cms'), (err, files) => {
+			Promise.map(
+				// Filter files down to the ones we care about
+				files.filter((filename) => {
+					// Ignore dotfiles
+					if (filename[0] === '.') { return false; }
+
+					return /\.js$/.test(filename);
+				}),
+
+				// Then upload each discovered page file
+				(filename) => {
+					return remote_handler.upload_to_filesystem_by_filepath(
+						'juicebox/' + filename,
+						path.join(enduro.project_path, 'cms', filename)
+					);
+				}
+			)
+			.then(() => {
+				// All done!
+				return resolve();
+			});
+		});
+	});
 }
 
 function write_juicebox (juicebox_name) {
