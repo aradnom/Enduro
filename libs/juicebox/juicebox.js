@@ -133,6 +133,8 @@ juicebox.prototype.force_pack = function (user) {
 						return write_juicefile(juice)
 					})
 					.then(() => {
+						// Write individual pages to S3 for conveniently 
+						// accessing latest copy of a specific page
 						return write_pages()
 					})
 					.then(() => {
@@ -140,6 +142,11 @@ juicebox.prototype.force_pack = function (user) {
 					})
 					.then(() => {
 						return remote_handler.upload_to_filesystem_by_filepath('juicebox/' + juice.latest.hash + EXTENSION, path.join(enduro.project_path, 'juicebox', juice.latest.hash + EXTENSION))
+					})
+					.then(() => {
+						// Write current CMS contents to tarball, again for 
+						// convenient access to latest content
+						return remote_handler.upload_to_filesystem_by_filepath('juicebox/' + 'latest' + EXTENSION, path.join(enduro.project_path, 'juicebox', juice.latest.hash + EXTENSION))
 					})
 					.then(() => {
 						logger.init('Juice pack')
